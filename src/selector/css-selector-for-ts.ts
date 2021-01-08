@@ -1,9 +1,11 @@
 import { SourceFile } from 'typescript';
 import * as ts from 'typescript';
 import { AttributeSelector, parse, Selector } from 'css-what';
-
-export function createCssSelectorForTs(sourceFile: SourceFile) {
-    return new CssSelectorForTs(sourceFile);
+export interface CssSelectorForTsOptions {
+    childrenMode: 'getChildren' | 'forEachChild';
+}
+export function createCssSelectorForTs(sourceFile: SourceFile, options: CssSelectorForTsOptions = { childrenMode: 'getChildren' }) {
+    return new CssSelectorForTs(sourceFile, options);
 }
 function findTag(name: string, node: ts.Node): boolean {
     return ts.SyntaxKind[name] === node.kind;
@@ -37,7 +39,12 @@ function findAttribute(selector: AttributeSelector, node: ts.Node): boolean {
         } catch (error) {}
     }
 }
-function findAllWithEachNode(node: NodeContext, fn: (node: ts.Node) => boolean, multiLevel?: boolean): NodeContext[] {
+function findAllWithEachNode(
+    node: NodeContext,
+    fn: (node: ts.Node) => boolean,
+    mode: CssSelectorForTsOptions['childrenMode'],
+    multiLevel?: boolean
+): NodeContext[] {
     let list: NodeContext[] = [node];
     let result = [];
     while (list.length) {
@@ -46,16 +53,24 @@ function findAllWithEachNode(node: NodeContext, fn: (node: ts.Node) => boolean, 
             result.push(node);
         }
         if (multiLevel) {
-            list.push(...node.node.getChildren().map((childNode, i) => new NodeContext(childNode, node, i)));
+            list.push(...getChildren(node.node, mode).map((childNode, i) => new NodeContext(childNode, node, i)));
         }
     }
     return result;
 }
-
+function getChildren(node: ts.Node, mode: CssSelectorForTsOptions['childrenMode']): ts.Node[] {
+    if (mode === 'forEachChild') {
+        let children: ts.Node[] = [];
+        node.forEachChild((node) => children.push(node) && undefined);
+        return children;
+    } else {
+        return node.getChildren();
+    }
+}
 class CssSelectorForTs {
     multi = true;
     currentNodeList: NodeContext[];
-    constructor(private sourceFile: SourceFile) {}
+    constructor(private sourceFile: SourceFile, private options: CssSelectorForTsOptions) {}
     query(selector: string): ts.Node[] {
         let selectedList: ts.Node[] = [];
         let result = parse(selector, { lowerCaseAttributeNames: false, lowerCaseTags: false });
@@ -77,7 +92,9 @@ class CssSelectorForTs {
         switch (selector.type) {
             case 'tag':
                 this.currentNodeList.forEach((nodeContext: NodeContext) => {
-                    list = list.concat(findAllWithEachNode(nodeContext, (node) => findTag(selector.name, node), this.multi));
+                    list = list.concat(
+                        findAllWithEachNode(nodeContext, (node) => findTag(selector.name, node), this.options.childrenMode, this.multi)
+                    );
                 });
                 this.currentNodeList = list;
                 this.multi = true;
@@ -85,7 +102,9 @@ class CssSelectorForTs {
             // 空格
             case 'descendant':
                 this.currentNodeList = [].concat(
-                    ...this.currentNodeList.map((node) => node.node.getChildren().map((child, i) => new NodeContext(child, node, i)))
+                    ...this.currentNodeList.map((node) =>
+                        getChildren(node.node, this.options.childrenMode).map((child, i) => new NodeContext(child, node, i))
+                    )
                 );
                 break;
             //+
@@ -95,7 +114,7 @@ class CssSelectorForTs {
                         .map(
                             (nodeContext) =>
                                 new NodeContext(
-                                    nodeContext.parent.node.getChildren()[nodeContext.index + 1],
+                                    getChildren(nodeContext.parent.node, this.options.childrenMode)[nodeContext.index + 1],
                                     nodeContext.parent,
                                     nodeContext.index + 1
                                 )
@@ -108,7 +127,9 @@ class CssSelectorForTs {
             // >
             case 'child':
                 this.currentNodeList = [].concat(
-                    ...this.currentNodeList.map((node) => node.node.getChildren().map((child, i) => new NodeContext(child, node, i)))
+                    ...this.currentNodeList.map((node) =>
+                        getChildren(node.node, this.options.childrenMode).map((child, i) => new NodeContext(child, node, i))
+                    )
                 );
                 this.multi = false;
                 break;
@@ -116,8 +137,7 @@ class CssSelectorForTs {
             case 'sibling':
                 this.currentNodeList = [].concat(
                     ...this.currentNodeList.map((nodeContent) =>
-                        nodeContent.parent.node
-                            .getChildren()
+                        getChildren(nodeContent.parent.node, this.options.childrenMode)
                             .filter((node, i) => i > nodeContent.index)
                             .map((node, i) => new NodeContext(node, nodeContent.parent, i))
                     )
@@ -128,7 +148,12 @@ class CssSelectorForTs {
             case 'attribute':
                 this.currentNodeList.forEach((nodeContext: NodeContext) => {
                     list = list.concat(
-                        findAllWithEachNode(nodeContext, (node) => findAttribute(selector as AttributeSelector, node), this.multi)
+                        findAllWithEachNode(
+                            nodeContext,
+                            (node) => findAttribute(selector as AttributeSelector, node),
+                            this.options.childrenMode,
+                            this.multi
+                        )
                     );
                 });
                 this.currentNodeList = list;
