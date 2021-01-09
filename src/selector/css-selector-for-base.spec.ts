@@ -15,12 +15,7 @@ class MockCssSelector extends CssSelectorBase<MockNode> {
     getChildren(node: MockNode) {
         return node.children || [];
     }
-    getQueryNode(node) {
-        if (node) {
-            return node;
-        }
-        return this.rootNode;
-    }
+
     getTagAttribute(selector: AttributeSelector, node: MockNode) {
         return node.attrs && node.attrs[selector.name];
     }
@@ -122,5 +117,9 @@ describe('选择器基类', () => {
         expect(selector.query('div>#mock').length).toBe(0);
         expect(selector.query('div+#mock').length).toBe(0);
         expect(selector.query('div~#mock').length).toBe(0);
+        let result = selector.query('div');
+        expect(result[0]).toBeTruthy();
+        expect(selector.query(result[0], '.test').length).toBe(0);
+        expect(selector.query(result[0], 'p').length).toBe(1);
     });
 });

@@ -53,25 +53,31 @@ export abstract class CssSelectorBase<NODE> {
         return result;
     }
     protected abstract getChildren(node: NODE): NODE[];
-    protected abstract getQueryNode(node?: NODE): NODE;
+    protected getInitQueryNodeContext(node: NODE): () => NodeContext<NODE>[] {
+        if (node) {
+            return () =>
+                this.getChildren(node).map((item) => new NodeContext(item, new NodeContext(node, undefined, undefined), undefined));
+        }
+        return () => [new NodeContext(this.rootNode, undefined, undefined)];
+    }
     query(node: NODE, selector: string): NODE[];
     query(selector: string): NODE[];
     query(arg1: NODE | string, arg2?: string) {
         let selector: string;
-        let queryElement: NODE;
+        let initQueryNodeContext: () => NodeContext<NODE>[];
 
         if (typeof arg1 === 'string') {
             selector = arg1;
-            queryElement = this.getQueryNode(undefined);
+            initQueryNodeContext = this.getInitQueryNodeContext(undefined);
         } else {
             selector = arg2;
-            queryElement = this.getQueryNode(arg1);
+            initQueryNodeContext = this.getInitQueryNodeContext(arg1);
         }
         let selectedList: NODE[] = [];
         /** css解析为token */
         let result = parse(selector, { lowerCaseAttributeNames: false, lowerCaseTags: false });
         for (let i = 0; i < result.length; i++) {
-            this.currentNodeList = [new NodeContext(queryElement, undefined, undefined)];
+            this.currentNodeList = initQueryNodeContext();
             this.limit = true;
             const selectorList = result[i];
             for (let j = 0; j < selectorList.length; j++) {

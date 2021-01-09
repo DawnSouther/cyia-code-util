@@ -18,12 +18,7 @@ export class CssSelectorForHtml extends CssSelectorBase<Element> {
         }
         this.rootNode = new Element('__root', [], parseTreeResult.rootNodes, undefined, undefined);
     }
-    protected getQueryNode(node: Element): Element {
-        if (node) {
-            return node;
-        }
-        return this.rootNode;
-    }
+
     protected getTagAttribute(selector: AttributeSelector, node: Element): Attribute {
         return node.attrs.find((item) => item.name === selector.name);
     }
