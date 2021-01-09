@@ -1,7 +1,7 @@
 {
   "name": "cyia-code-util",
   "version": "1.0.0",
-  "description": "",
+  "description": "代码工具",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
