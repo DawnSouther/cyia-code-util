@@ -6,22 +6,23 @@ export function createCssSelectorForHtml(htmlContent: string) {
     return new CssSelectorForHtml(htmlContent);
 }
 
-export class CssSelectorForHtml extends CssSelectorBase<Element, ParseTreeResult> {
-    protected parseTree: ParseTreeResult;
+export class CssSelectorForHtml extends CssSelectorBase<Element> {
+    protected rootNode: Element;
 
     constructor(htmlString: string) {
         super();
         let parser = new HtmlParser();
-        this.parseTree = parser.parse(htmlString, '');
-        if (this.parseTree.errors && this.parseTree.errors.length) {
-            throw this.parseTree.errors;
+        let parseTreeResult = parser.parse(htmlString, '');
+        if (parseTreeResult.errors && parseTreeResult.errors.length) {
+            throw parseTreeResult.errors;
         }
+        this.rootNode = new Element('__root', [], parseTreeResult.rootNodes, undefined, undefined);
     }
     protected getQueryNode(node: Element): Element {
         if (node) {
             return node;
         }
-        return new Element('__root', [], this.parseTree.rootNodes, undefined, undefined);
+        return this.rootNode;
     }
     protected getTagAttribute(selector: AttributeSelector, node: Element): Attribute {
         return node.attrs.find((item) => item.name === selector.name);

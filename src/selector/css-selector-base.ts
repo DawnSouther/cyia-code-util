@@ -2,8 +2,8 @@ import { AttributeSelector, parse, Selector } from 'css-what';
 export class NodeContext<T> {
     constructor(public node: T, public parent: NodeContext<T>, public index: number) {}
 }
-export abstract class CssSelectorBase<NODE, PARSETREE> {
-    protected abstract parseTree: PARSETREE;
+export abstract class CssSelectorBase<NODE> {
+    protected abstract readonly rootNode: NODE;
     private currentNodeList: NodeContext<NODE>[];
     private limit = true;
     protected abstract getTagAttribute(selector: AttributeSelector, node: NODE): { value: string };

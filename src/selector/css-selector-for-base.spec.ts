@@ -5,8 +5,8 @@ interface MockNode {
     tag: string;
     children?: MockNode[];
 }
-class MockCssSelector extends CssSelectorBase<MockNode, MockNode> {
-    constructor(protected parseTree: MockNode) {
+class MockCssSelector extends CssSelectorBase<MockNode> {
+    constructor(protected rootNode: MockNode) {
         super();
     }
     findTag(name, node: MockNode) {
@@ -19,7 +19,7 @@ class MockCssSelector extends CssSelectorBase<MockNode, MockNode> {
         if (node) {
             return node;
         }
-        return this.parseTree;
+        return this.rootNode;
     }
     getTagAttribute(selector: AttributeSelector, node: MockNode) {
         return node.attrs && node.attrs[selector.name];

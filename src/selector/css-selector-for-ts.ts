@@ -9,15 +9,15 @@ export function createCssSelectorForTs(sourceFile: SourceFile, options: CssSelec
     return new CssSelectorForTs(sourceFile, options);
 }
 
-class CssSelectorForTs extends CssSelectorBase<ts.Node, SourceFile> {
-    constructor(protected parseTree: SourceFile, private options: CssSelectorForTsOptions) {
+class CssSelectorForTs extends CssSelectorBase<ts.Node> {
+    constructor(protected rootNode: SourceFile, private options: CssSelectorForTsOptions) {
         super();
     }
     protected getQueryNode(node: ts.Node) {
         if (node) {
             return node;
         }
-        return this.parseTree;
+        return this.rootNode;
     }
     protected getTagAttribute(selector: AttributeSelector, node: ts.Node): { value: string } {
         return node[selector.name] && Number.isInteger(node[selector.name].kind)
