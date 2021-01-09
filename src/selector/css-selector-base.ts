@@ -5,7 +5,7 @@ export class NodeContext<T> {
 export abstract class CssSelectorBase<NODE, PARSETREE> {
     protected abstract parseTree: PARSETREE;
     private currentNodeList: NodeContext<NODE>[];
-    private multi = true;
+    private limit = true;
     protected abstract getTagAttribute(selector: AttributeSelector, node: NODE): { value: string };
     protected abstract findTag(name: string, node: NODE): boolean;
     protected findAttribute(selector: AttributeSelector, node: NODE): boolean {
@@ -72,7 +72,7 @@ export abstract class CssSelectorBase<NODE, PARSETREE> {
         let result = parse(selector, { lowerCaseAttributeNames: false, lowerCaseTags: false });
         for (let i = 0; i < result.length; i++) {
             this.currentNodeList = [new NodeContext(queryElement, undefined, undefined)];
-            this.multi = true;
+            this.limit = true;
             const selectorList = result[i];
             for (let j = 0; j < selectorList.length; j++) {
                 const selector = selectorList[j];
@@ -90,17 +90,17 @@ export abstract class CssSelectorBase<NODE, PARSETREE> {
             // 匹配标签
             case 'tag':
                 this.currentNodeList.forEach((nodeContext: NodeContext<NODE>) => {
-                    list = list.concat(this.findWithEachNode(nodeContext, (node) => this.findTag(selector.name, node), this.multi));
+                    list = list.concat(this.findWithEachNode(nodeContext, (node) => this.findTag(selector.name, node), this.limit));
                 });
                 this.currentNodeList = list;
-                this.multi = false;
+                this.limit = false;
                 break;
             // 空格
             case 'descendant':
                 this.currentNodeList = [].concat(
                     ...this.currentNodeList.map((node) => this.getChildren(node.node).map((child, i) => new NodeContext(child, node, i)))
                 );
-                this.multi = true;
+                this.limit = true;
                 break;
             //+
             case 'adjacent':
@@ -117,14 +117,14 @@ export abstract class CssSelectorBase<NODE, PARSETREE> {
                         .filter((node) => node.node)
                 );
 
-                this.multi = false;
+                this.limit = false;
                 break;
             // >
             case 'child':
                 this.currentNodeList = [].concat(
                     ...this.currentNodeList.map((node) => this.getChildren(node.node).map((child, i) => new NodeContext(child, node, i)))
                 );
-                this.multi = false;
+                this.limit = false;
                 break;
             // ~
             case 'sibling':
@@ -136,17 +136,17 @@ export abstract class CssSelectorBase<NODE, PARSETREE> {
                     )
                 );
 
-                this.multi = false;
+                this.limit = false;
                 break;
             //[] .xxx
             case 'attribute':
                 this.currentNodeList.forEach((nodeContext: NodeContext<NODE>) => {
                     list = list.concat(
-                        this.findWithEachNode(nodeContext, (node) => this.findAttribute(selector as AttributeSelector, node), this.multi)
+                        this.findWithEachNode(nodeContext, (node) => this.findAttribute(selector as AttributeSelector, node), this.limit)
                     );
                 });
                 this.currentNodeList = list;
-                this.multi = false;
+                this.limit = false;
                 break;
             default:
                 break;
