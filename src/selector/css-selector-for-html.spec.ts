@@ -93,4 +93,14 @@ describe('用于ts node的css选择器', () => {
         expect(result.length).toBe(1);
         expect(result[0].name === 'p').toBeTruthy();
     });
+    it('不应该选中', () => {
+        let cssSelctor = createCssSelectorForHtml(mockHtml);
+
+        expect(cssSelctor.query('div .test').length).toBe(0);
+        expect(cssSelctor.query('div [class=test]').length).toBe(0);
+        expect(cssSelctor.query('div #mock').length).toBe(0);
+        expect(cssSelctor.query('div>#mock').length).toBe(0);
+        expect(cssSelctor.query('div+#mock').length).toBe(0);
+        expect(cssSelctor.query('div~#mock').length).toBe(0);
+    });
 });
