@@ -56,7 +56,7 @@ export abstract class CssSelectorBase<NODE, PARSETREE> {
     protected abstract getQueryNode(node?: NODE): NODE;
     query(node: NODE, selector: string): NODE[];
     query(selector: string): NODE[];
-    query(arg1: any, arg2?) {
+    query(arg1: NODE | string, arg2?: string) {
         let selector: string;
         let queryElement: NODE;
 
@@ -68,11 +68,11 @@ export abstract class CssSelectorBase<NODE, PARSETREE> {
             queryElement = this.getQueryNode(arg1);
         }
         let selectedList: NODE[] = [];
-
+        /** css解析为token */
         let result = parse(selector, { lowerCaseAttributeNames: false, lowerCaseTags: false });
-        /** 使用一个虚拟节点支持搜索 */
         for (let i = 0; i < result.length; i++) {
             this.currentNodeList = [new NodeContext(queryElement, undefined, undefined)];
+            this.multi = true;
             const selectorList = result[i];
             for (let j = 0; j < selectorList.length; j++) {
                 const selector = selectorList[j];
@@ -93,13 +93,14 @@ export abstract class CssSelectorBase<NODE, PARSETREE> {
                     list = list.concat(this.findWithEachNode(nodeContext, (node) => this.findTag(selector.name, node), this.multi));
                 });
                 this.currentNodeList = list;
-                this.multi = true;
+                this.multi = false;
                 break;
             // 空格
             case 'descendant':
                 this.currentNodeList = [].concat(
                     ...this.currentNodeList.map((node) => this.getChildren(node.node).map((child, i) => new NodeContext(child, node, i)))
                 );
+                this.multi = true;
                 break;
             //+
             case 'adjacent':
@@ -145,7 +146,7 @@ export abstract class CssSelectorBase<NODE, PARSETREE> {
                     );
                 });
                 this.currentNodeList = list;
-                this.multi = true;
+                this.multi = false;
                 break;
             default:
                 break;

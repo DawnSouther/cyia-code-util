@@ -1,169 +1,56 @@
 import { SourceFile } from 'typescript';
 import * as ts from 'typescript';
 import { AttributeSelector, parse, Selector } from 'css-what';
+import { CssSelectorBase } from './css-selector-base';
 export interface CssSelectorForTsOptions {
     childrenMode: 'getChildren' | 'forEachChild';
 }
 export function createCssSelectorForTs(sourceFile: SourceFile, options: CssSelectorForTsOptions = { childrenMode: 'getChildren' }) {
     return new CssSelectorForTs(sourceFile, options);
 }
-function findTag(name: string, node: ts.Node): boolean {
-    return ts.SyntaxKind[name] === node.kind;
-}
-function findAttribute(selector: AttributeSelector, node: ts.Node): boolean {
-    let attrValue: ts.Node = node[selector.name];
-    if (attrValue && Number.isInteger(attrValue.kind)) {
-        let str: string;
-        try {
-            str = attrValue.getText();
-            switch (selector.action) {
-                case 'equals':
-                    return str === selector.value;
-                case 'any':
-                    return str.includes(selector.value);
-                case 'start':
-                    return str.startsWith(selector.value);
-                case 'end':
-                    return str.endsWith(selector.value);
-                case 'element':
-                    return str.split(' ').includes(selector.value);
-                case 'hyphen':
-                    return str.split(' ')[0].split('-')[0] === selector.value;
-                case 'not':
-                    return str !== selector.value;
-                case 'exists':
-                    return !!attrValue;
-                default:
-                    return str === selector.value;
+
+class CssSelectorForTs extends CssSelectorBase<ts.Node, SourceFile> {
+    constructor(protected parseTree: SourceFile, private options: CssSelectorForTsOptions) {
+        super();
+    }
+    protected getQueryNode(node: ts.Node) {
+        if (node) {
+            return node;
+        }
+        return this.parseTree;
+    }
+    protected getTagAttribute(selector: AttributeSelector, node: ts.Node): { value: string } {
+        return node[selector.name] && Number.isInteger(node[selector.name].kind)
+            ? {
+                  value: node[selector.name].text && node[selector.name].getText(),
+              }
+            : undefined;
+    }
+    findTag(name: string, node: ts.Node): boolean {
+        return ts.SyntaxKind[name] === node.kind;
+    }
+    findWithEachNode(node: NodeContext, fn: (node: ts.Node) => boolean, multiLevel?: boolean): NodeContext[] {
+        let list: NodeContext[] = [node];
+        let result = [];
+        while (list.length) {
+            let node = list.pop();
+            if (fn(node.node)) {
+                result.push(node);
             }
-        } catch (error) {}
-    }
-}
-function findAllWithEachNode(
-    node: NodeContext,
-    fn: (node: ts.Node) => boolean,
-    mode: CssSelectorForTsOptions['childrenMode'],
-    multiLevel?: boolean
-): NodeContext[] {
-    let list: NodeContext[] = [node];
-    let result = [];
-    while (list.length) {
-        let node = list.pop();
-        if (fn(node.node)) {
-            result.push(node);
-        }
-        if (multiLevel) {
-            list.push(...getChildren(node.node, mode).map((childNode, i) => new NodeContext(childNode, node, i)));
-        }
-    }
-    return result;
-}
-function getChildren(node: ts.Node, mode: CssSelectorForTsOptions['childrenMode']): ts.Node[] {
-    if (mode === 'forEachChild') {
-        let children: ts.Node[] = [];
-        node.forEachChild((node) => children.push(node) && undefined);
-        return children;
-    } else {
-        return node.getChildren();
-    }
-}
-class CssSelectorForTs {
-    multi = true;
-    currentNodeList: NodeContext[];
-    constructor(private sourceFile: SourceFile, private options: CssSelectorForTsOptions) {}
-    query(selector: string): ts.Node[] {
-        let selectedList: ts.Node[] = [];
-        let result = parse(selector, { lowerCaseAttributeNames: false, lowerCaseTags: false });
-        for (let i = 0; i < result.length; i++) {
-            this.currentNodeList = [new NodeContext(this.sourceFile, undefined, undefined)];
-            const selectorList = result[i];
-            for (let j = 0; j < selectorList.length; j++) {
-                const selector = selectorList[j];
-                if (!this.parse(selector)) {
-                    break;
-                }
+            if (multiLevel) {
+                list.push(...this.getChildren(node.node).map((childNode, i) => new NodeContext(childNode, node, i)));
             }
-            selectedList.push(...this.currentNodeList.map((node) => node.node));
         }
-        return selectedList;
+        return result;
     }
-    private parse(selector: Selector): boolean {
-        let list: NodeContext[] = [];
-        switch (selector.type) {
-            case 'tag':
-                this.currentNodeList.forEach((nodeContext: NodeContext) => {
-                    list = list.concat(
-                        findAllWithEachNode(nodeContext, (node) => findTag(selector.name, node), this.options.childrenMode, this.multi)
-                    );
-                });
-                this.currentNodeList = list;
-                this.multi = true;
-                break;
-            // 空格
-            case 'descendant':
-                this.currentNodeList = [].concat(
-                    ...this.currentNodeList.map((node) =>
-                        getChildren(node.node, this.options.childrenMode).map((child, i) => new NodeContext(child, node, i))
-                    )
-                );
-                break;
-            //+
-            case 'adjacent':
-                this.currentNodeList = [].concat(
-                    this.currentNodeList
-                        .map(
-                            (nodeContext) =>
-                                new NodeContext(
-                                    getChildren(nodeContext.parent.node, this.options.childrenMode)[nodeContext.index + 1],
-                                    nodeContext.parent,
-                                    nodeContext.index + 1
-                                )
-                        )
-                        .filter((node) => node.node)
-                );
-
-                this.multi = false;
-                break;
-            // >
-            case 'child':
-                this.currentNodeList = [].concat(
-                    ...this.currentNodeList.map((node) =>
-                        getChildren(node.node, this.options.childrenMode).map((child, i) => new NodeContext(child, node, i))
-                    )
-                );
-                this.multi = false;
-                break;
-            // ~
-            case 'sibling':
-                this.currentNodeList = [].concat(
-                    ...this.currentNodeList.map((nodeContent) =>
-                        getChildren(nodeContent.parent.node, this.options.childrenMode)
-                            .filter((node, i) => i > nodeContent.index)
-                            .map((node, i) => new NodeContext(node, nodeContent.parent, i))
-                    )
-                );
-
-                this.multi = false;
-                break;
-            case 'attribute':
-                this.currentNodeList.forEach((nodeContext: NodeContext) => {
-                    list = list.concat(
-                        findAllWithEachNode(
-                            nodeContext,
-                            (node) => findAttribute(selector as AttributeSelector, node),
-                            this.options.childrenMode,
-                            this.multi
-                        )
-                    );
-                });
-                this.currentNodeList = list;
-                this.multi = true;
-                break;
-            default:
-                break;
+    getChildren(node: ts.Node): ts.Node[] {
+        if (this.options.childrenMode === 'forEachChild') {
+            let children: ts.Node[] = [];
+            node.forEachChild((node) => children.push(node) && undefined);
+            return children;
+        } else {
+            return node.getChildren();
         }
-
-        return !!this.currentNodeList.length;
     }
 }
 
