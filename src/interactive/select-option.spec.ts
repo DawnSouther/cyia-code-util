@@ -1,8 +1,32 @@
 import { selectOption } from './select-option';
-// import * as readline from "readline";
-xdescribe('[手动]选择选项', () => {
-    // todo 封装之前是可以result.ui.rl 拿到实例模拟传入的,但是封装后丢失
+import * as inquirer from 'inquirer';
+import * as readline from 'readline';
+function hookPrompt() {
+    let ui = inquirer.ui;
+    let Prompt = ui.Prompt;
+    let currentRl: readline.Interface;
+    ui.Prompt = class Hook extends Prompt {
+        constructor(...args) {
+            super(args[0], args[1]);
+            currentRl = this.rl;
+        }
+    } as any;
+    return {
+        getCurrentRl: () => {
+            return currentRl;
+        },
+        reset: () => {
+            ui.Prompt = Prompt;
+        },
+    };
+}
+
+describe('[手动]选择选项', () => {
+    let hookGroup = hookPrompt();
+    let rl: readline.Interface;
+
     it('执行', (done) => {
+        hookPrompt();
         let result = selectOption(
             [
                 { label: 't1', value: 'an1' },
@@ -14,7 +38,12 @@ xdescribe('[手动]选择选项', () => {
             expect(res).toBe('an1');
             done();
         });
+        rl = hookGroup.getCurrentRl();
+        rl.emit('line');
+        rl.close();
     });
-    // let re=readline.createInterface(process.stdin,process.stdout)
-    // re.emit('line')
+
+    afterAll(() => {
+        hookGroup.reset();
+    });
 });
