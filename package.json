@@ -1,6 +1,6 @@
 {
   "name": "cyia-code-util",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "代码工具",
   "main": "dist/index.js",
   "scripts": {
