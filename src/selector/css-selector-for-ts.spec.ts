@@ -15,46 +15,46 @@ describe('用于ts node的css选择器', () => {
     });
     it('默认', () => {
         let cssSelctor = createCssSelectorForTs(createSourceFile('let a=6'));
-        let result = cssSelctor.query('VariableDeclaration Identifier');
+        let result = cssSelctor.queryAll('VariableDeclaration Identifier');
         expect(result.length).toBe(1);
     });
     it('~', () => {
         let cssSelctor = createCssSelectorForTs(createSourceFile('let a=6'));
-        let result = cssSelctor.query('Identifier~NumericLiteral');
+        let result = cssSelctor.queryAll('Identifier~NumericLiteral');
 
         expect(result.length).toBe(1);
         expect(result[0].kind === ts.SyntaxKind.NumericLiteral).toBeTrue();
     });
     it('>', () => {
         let cssSelctor = createCssSelectorForTs(createSourceFile('let a=6'));
-        let result = cssSelctor.query('VariableDeclaration>Identifier');
+        let result = cssSelctor.queryAll('VariableDeclaration>Identifier');
 
         expect(result.length).toBe(1);
         expect(result[0].kind === ts.SyntaxKind.Identifier).toBeTrue();
     });
     it(',', () => {
         let cssSelctor = createCssSelectorForTs(createSourceFile('let a=6'));
-        let result = cssSelctor.query('VariableDeclaration,Identifier');
+        let result = cssSelctor.queryAll('VariableDeclaration,Identifier');
 
         expect(result.length).toBe(2);
     });
     it('attribute equal', () => {
         let cssSelctor = createCssSelectorForTs(createSourceFile('let a=6'));
-        let result = cssSelctor.query('VariableDeclaration[name=a]');
+        let result = cssSelctor.queryAll('VariableDeclaration[name=a]');
 
         expect(result.length).toBe(1);
         expect(result[0].kind).toBe(ts.SyntaxKind.VariableDeclaration);
     });
     it('attribute exist', () => {
         let cssSelctor = createCssSelectorForTs(createSourceFile('let a=6'));
-        let result = cssSelctor.query('VariableDeclaration[name]');
+        let result = cssSelctor.queryAll('VariableDeclaration[name]');
 
         expect(result.length).toBe(1);
         expect(result[0].kind).toBe(ts.SyntaxKind.VariableDeclaration);
     });
     it('attribute any', () => {
         let cssSelctor = createCssSelectorForTs(createSourceFile('let a=689'));
-        let result = cssSelctor.query('VariableDeclaration[initializer*=8]');
+        let result = cssSelctor.queryAll('VariableDeclaration[initializer*=8]');
 
         expect(result.length).toBe(1);
         expect(result[0].kind).toBe(ts.SyntaxKind.VariableDeclaration);

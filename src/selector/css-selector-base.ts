@@ -60,7 +60,9 @@ export abstract class CssSelectorBase<NODE> {
         }
         return () => [new NodeContext(this.rootNode, undefined, undefined)];
     }
+    /** @deprecated */
     query(node: NODE, selector: string): NODE[];
+    /** @deprecated */
     query(selector: string): NODE[];
     query(arg1: NODE | string, arg2?: string) {
         let selector: string;
@@ -89,6 +91,16 @@ export abstract class CssSelectorBase<NODE> {
             selectedList.push(...this.currentNodeList.map((node) => node.node));
         }
         return selectedList;
+    }
+    queryAll(node: NODE, selector: string): NODE[];
+    queryAll(selector: string): NODE[];
+    queryAll(arg1: any, arg2?: any) {
+        return this.query(arg1, arg2);
+    }
+    queryOne(node: NODE, selector: string): NODE;
+    queryOne(selector: string): NODE;
+    queryOne(arg1: any, arg2?: any) {
+        return this.query(arg1, arg2)[0];
     }
     protected parse(selector: Selector): boolean {
         let list: NodeContext<NODE>[] = [];

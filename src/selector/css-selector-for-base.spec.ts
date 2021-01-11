@@ -35,29 +35,29 @@ describe('选择器基类', () => {
         expect(selector).toBeTruthy();
     });
     it('标签查询', () => {
-        let result = selector.query('div');
+        let result = selector.queryAll('div');
         // console.log(result)
         expect(result.length).toBe(1);
     });
     it('~', () => {
-        let result = selector.query('div~span');
+        let result = selector.queryAll('div~span');
 
         expect(result.length).toBe(1);
         expect(result[0].tag === 'span').toBeTrue();
     });
     it('>', () => {
-        let result = selector.query('div>p');
+        let result = selector.queryAll('div>p');
 
         expect(result.length).toBe(1);
         expect(result[0].tag === 'p').toBeTrue();
     });
     it(',', () => {
-        let result = selector.query('div,span');
+        let result = selector.queryAll('div,span');
 
         expect(result.length).toBe(2);
     });
     it('attribute equal', () => {
-        let result = selector.query('div[id=mock]');
+        let result = selector.queryAll('div[id=mock]');
 
         expect(result.length).toBe(1);
         expect(result[0].tag === 'div').toBeTruthy();
@@ -65,14 +65,14 @@ describe('选择器基类', () => {
         expect(result[0].attrs['id'].value == 'mock').toBeTruthy();
     });
     it('attribute exist', () => {
-        let result = selector.query('div[id]');
+        let result = selector.queryAll('div[id]');
 
         expect(result.length).toBe(1);
         expect(result[0].tag === 'div').toBeTruthy();
         expect(result[0].attrs['id']).toBeTruthy();
     });
     it('attribute any', () => {
-        let result = selector.query('div[id*=mo]');
+        let result = selector.queryAll('div[id*=mo]');
 
         expect(result.length).toBe(1);
         expect(result[0].tag === 'div').toBeTruthy();
@@ -80,46 +80,46 @@ describe('选择器基类', () => {
         expect(result[0].attrs['id'].value == 'mock').toBeTruthy();
     });
     it('.class', () => {
-        let result = selector.query('div.test');
+        let result = selector.queryAll('div.test');
         expect(result.length).toBe(1);
         expect(result[0].tag === 'div').toBeTruthy();
         expect(result[0].attrs['class']).toBeTruthy();
         expect(result[0].attrs['class'].value === 'test').toBeTruthy();
     });
     it('#id', () => {
-        let result = selector.query('#mock');
+        let result = selector.queryAll('#mock');
         expect(result.length).toBe(1);
         expect(result[0].tag === 'div').toBeTruthy();
         expect(result[0].attrs['id']).toBeTruthy();
         expect(result[0].attrs['id'].value === 'mock').toBeTruthy();
     });
     it('通过返回的element进行查询', () => {
-        let result = selector.query('div.test');
+        let result = selector.queryAll('div.test');
         expect(result.length).toBe(1);
-        result = selector.query(result[0], 'p');
+        result = selector.queryAll(result[0], 'p');
         expect(result.length).toBe(1);
         expect(result[0].tag).toBe('p');
     });
     it('a b c', () => {
-        let result = selector.query('div  p code');
+        let result = selector.queryAll('div  p code');
         expect(result.length).toBe(1);
         expect(result[0].tag === 'code').toBeTruthy();
     });
     it('复杂选择', () => {
-        let result = selector.query('div#mock.test[class=test][id=mock] p');
+        let result = selector.queryAll('div#mock.test[class=test][id=mock] p');
         expect(result.length).toBe(1);
         expect(result[0].tag === 'p').toBeTruthy();
     });
     it('不应该选中', () => {
-        expect(selector.query('div .test').length).toBe(0);
-        expect(selector.query('div [class=test]').length).toBe(0);
-        expect(selector.query('div #mock').length).toBe(0);
-        expect(selector.query('div>#mock').length).toBe(0);
-        expect(selector.query('div+#mock').length).toBe(0);
-        expect(selector.query('div~#mock').length).toBe(0);
-        let result = selector.query('div');
+        expect(selector.queryAll('div .test').length).toBe(0);
+        expect(selector.queryAll('div [class=test]').length).toBe(0);
+        expect(selector.queryAll('div #mock').length).toBe(0);
+        expect(selector.queryAll('div>#mock').length).toBe(0);
+        expect(selector.queryAll('div+#mock').length).toBe(0);
+        expect(selector.queryAll('div~#mock').length).toBe(0);
+        let result = selector.queryAll('div');
         expect(result[0]).toBeTruthy();
-        expect(selector.query(result[0], '.test').length).toBe(0);
-        expect(selector.query(result[0], 'p').length).toBe(1);
+        expect(selector.queryAll(result[0], '.test').length).toBe(0);
+        expect(selector.queryAll(result[0], 'p').length).toBe(1);
     });
 });
