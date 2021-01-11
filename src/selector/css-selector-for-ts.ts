@@ -5,7 +5,13 @@ import { CssSelectorBase, NodeContext } from './css-selector-base';
 export interface CssSelectorForTsOptions {
     childrenMode: 'getChildren' | 'forEachChild';
 }
-export function createCssSelectorForTs(sourceFile: SourceFile, options: CssSelectorForTsOptions = { childrenMode: 'getChildren' }) {
+export function createCssSelectorForTs(
+    sourceFile: SourceFile | string,
+    options: CssSelectorForTsOptions = { childrenMode: 'getChildren' }
+) {
+    if (typeof sourceFile == 'string') {
+        sourceFile = ts.createSourceFile('', sourceFile, ts.ScriptTarget.Latest, true);
+    }
     return new CssSelectorForTs(sourceFile, options);
 }
 

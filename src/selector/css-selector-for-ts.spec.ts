@@ -59,4 +59,11 @@ describe('用于ts node的css选择器', () => {
         expect(result.length).toBe(1);
         expect(result[0].kind).toBe(ts.SyntaxKind.VariableDeclaration);
     });
+    it('传入字符串', () => {
+        let cssSelctor = createCssSelectorForTs('let a=689');
+        let result = cssSelctor.queryAll('VariableDeclaration');
+
+        expect(result.length).toBe(1);
+        expect(result[0].kind).toBe(ts.SyntaxKind.VariableDeclaration);
+    });
 });
