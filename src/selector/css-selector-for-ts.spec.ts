@@ -66,4 +66,12 @@ describe('用于ts node的css选择器', () => {
         expect(result.length).toBe(1);
         expect(result[0].kind).toBe(ts.SyntaxKind.VariableDeclaration);
     });
+    it('普通 node 做根节点', () => {
+        let sourceFile = ts.createSourceFile('', `let a=[1,2]`, ts.ScriptTarget.Latest, true);
+        let cssSelctor = createCssSelectorForTs(sourceFile);
+        let nodeSelector = createCssSelectorForTs(cssSelctor.queryOne('ArrayLiteralExpression'));
+        let result = nodeSelector.queryAll('NumericLiteral');
+        expect(result.length).toBe(2);
+        expect(result[0].kind).toBe(ts.SyntaxKind.NumericLiteral);
+    });
 });

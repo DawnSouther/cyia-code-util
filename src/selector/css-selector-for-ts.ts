@@ -6,7 +6,7 @@ export interface CssSelectorForTsOptions {
     childrenMode: 'getChildren' | 'forEachChild';
 }
 export function createCssSelectorForTs(
-    sourceFile: SourceFile | string,
+    sourceFile: SourceFile | string | ts.Node,
     options: CssSelectorForTsOptions = { childrenMode: 'getChildren' }
 ) {
     if (typeof sourceFile == 'string') {
@@ -16,7 +16,7 @@ export function createCssSelectorForTs(
 }
 
 export class CssSelectorForTs extends CssSelectorBase<ts.Node> {
-    constructor(protected rootNode: SourceFile, private options: CssSelectorForTsOptions) {
+    constructor(protected rootNode: SourceFile | ts.Node, private options: CssSelectorForTsOptions) {
         super();
     }
 
