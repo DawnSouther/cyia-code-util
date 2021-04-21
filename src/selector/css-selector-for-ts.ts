@@ -15,7 +15,7 @@ export function createCssSelectorForTs(
     return new CssSelectorForTs(sourceFile, options);
 }
 
-class CssSelectorForTs extends CssSelectorBase<ts.Node> {
+export class CssSelectorForTs extends CssSelectorBase<ts.Node> {
     constructor(protected rootNode: SourceFile, private options: CssSelectorForTsOptions) {
         super();
     }
