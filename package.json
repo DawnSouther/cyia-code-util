@@ -1,6 +1,6 @@
 {
   "name": "cyia-code-util",
-  "version": "1.0.6",
+  "version": "1.1.0",
   "description": "代码工具",
   "main": "dist/index.js",
   "scripts": {
@@ -34,7 +34,8 @@
   "dependencies": {
     "@angular/compiler": "^11.0.7",
     "css-what": "^4.0.0",
-    "inquirer": "^7.3.3"
+    "inquirer": "^7.3.3",
+    "jsonc-parser": "^3.0.0"
   },
   "husky": {
     "hooks": {
