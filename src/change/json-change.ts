@@ -32,12 +32,10 @@ export class JsonChange {
     }
     insertChildNode(node: Node, content: string) {
         let children = node.children[1].children;
-        if (children) {
-            if (children.length === 0) {
-                return new InsertChange(node.children[1].offset + 1, content);
-            } else {
-                return this.insertNode(children[children.length - 1], content, 'after');
-            }
+        if (children.length === 0) {
+            return new InsertChange(node.children[1].offset + 1, content);
+        } else {
+            return this.insertNode(children[children.length - 1], content, 'after');
         }
     }
 }
