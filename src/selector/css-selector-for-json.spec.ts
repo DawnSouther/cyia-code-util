@@ -4,7 +4,7 @@ function createSelector(str: string = mockJsonString) {
     return createCssSelectorForJson(str);
 }
 
-fdescribe('用于json的css选择器', () => {
+describe('用于json的css选择器', () => {
     it('初始化', () => {
         let jsonSelector = createCssSelectorForJson('{"name":1}');
         expect(jsonSelector).toBeTruthy();
@@ -55,7 +55,7 @@ fdescribe('用于json的css选择器', () => {
         let result = selector.queryAll('p3 p31 p32');
         expect(result.length).toBe(1);
     });
-    fit('通过返回的node进行查询', () => {
+    it('通过返回的node进行查询', () => {
         let selector = createSelector();
         let result = selector.queryOne('p3');
         result = selector.queryOne(result, 'p31 p32');
