@@ -1,12 +1,11 @@
 {
   "name": "cyia-code-util",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "代码工具",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc -p tsconfig.json",
     "test": "ts-node -P ./tsconfig.spec.json ./node_modules/jasmine/bin/jasmine --config=jasmine.json",
-    "prepublishOnly": "npm run build",
     "deploy": "typedoc --out docs src/index.ts"
   },
   "repository": {
