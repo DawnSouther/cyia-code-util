@@ -21,11 +21,15 @@ export class CssSelectorForTs extends CssSelectorBase<ts.Node> {
     }
 
     protected getTagAttribute(selector: AttributeSelector, node: ts.Node): { value: string } {
-        return node[selector.name] && Number.isInteger(node[selector.name].kind)
-            ? {
-                  value: node[selector.name].text && node[selector.name].getText(),
-              }
-            : undefined;
+        try {
+            return node[selector.name] && Number.isInteger(node[selector.name].kind)
+                ? {
+                      value: node[selector.name].getText && node[selector.name].getText(),
+                  }
+                : undefined;
+        } catch (error) {
+            return undefined;
+        }
     }
     protected findTag(name: string, node: ts.Node): boolean {
         return ts.SyntaxKind[name] === node.kind;
