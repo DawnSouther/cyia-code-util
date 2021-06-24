@@ -10,7 +10,7 @@ export class TsChange {
     replaceNode(node: Node, content: string, options: NodeOptions = {}) {
         let start = this.getNodeStart(node, options);
 
-        return new ReplaceChange(start, start + this.getNodeWidth(node, options), content);
+        return new ReplaceChange(start, this.getNodeWidth(node, options), content);
     }
     deleteNode(node: Node, options: NodeOptions = {}) {
         let start = this.getNodeStart(node, options);
