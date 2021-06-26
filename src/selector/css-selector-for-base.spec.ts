@@ -6,7 +6,7 @@ interface MockNode {
     children?: MockNode[];
 }
 class MockCssSelector extends CssSelectorBase<MockNode> {
-    constructor(protected rootNode: MockNode) {
+    constructor(public rootNode: MockNode) {
         super();
     }
     findTag(name, node: MockNode) {
