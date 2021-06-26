@@ -7,7 +7,7 @@ export function createCssSelectorForHtml(htmlContent: string) {
 }
 
 export class CssSelectorForHtml extends CssSelectorBase<Element> {
-    protected rootNode: Element;
+    rootNode: Element;
 
     constructor(htmlString: string) {
         super();

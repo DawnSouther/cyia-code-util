@@ -7,7 +7,7 @@ export function createCssSelectorForJson(htmlContent: string) {
 }
 
 export class CssSelectorForJson extends CssSelectorBase<Node> {
-    protected rootNode: Node;
+    rootNode: Node;
 
     constructor(jsonString: string) {
         super();
