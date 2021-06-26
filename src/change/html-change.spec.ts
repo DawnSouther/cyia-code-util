@@ -86,4 +86,12 @@ describe('html-change', () => {
         let result = UpdaterTest.update(content, insertChange);
         expect(result).toBe(`<div name="test" value="test"></div>`);
     });
+    it('替换属性标签', () => {
+        let selector = createCssSelectorForHtml(content);
+        let element = selector.queryOne('div');
+        let change = new HtmlChange();
+        let insertChange = change.replaceTagAttribute(element.attrs[0], `id="mytest"`);
+        let result = UpdaterTest.update(content, insertChange);
+        expect(result).toBe(`<div id="mytest"></div>`);
+    });
 });

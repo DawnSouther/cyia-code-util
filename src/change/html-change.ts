@@ -1,4 +1,4 @@
-import { Element } from '@angular/compiler';
+import { Attribute, Element } from '@angular/compiler';
 import { DeleteChange, InsertChange, ReplaceChange } from './content-change';
 export class HtmlChange {
     constructor() {}
@@ -34,6 +34,9 @@ export class HtmlChange {
         let attribute = element.attrs.find((item) => item.name === attributeName);
         let start = attribute.sourceSpan.start.offset;
         return new DeleteChange(start, attribute.sourceSpan.end.offset - start);
+    }
+    replaceTagAttribute(element: Attribute, content: string) {
+        return new ReplaceChange(element.sourceSpan.start.offset, element.sourceSpan.end.offset - element.sourceSpan.start.offset, content);
     }
     setTagAttribute(element: Element, content: string) {
         let start = element.startSourceSpan.start.offset + element.name.length + 1;
