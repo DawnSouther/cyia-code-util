@@ -6,25 +6,30 @@ export interface CssSelectorForTsOptions {
     childrenMode: 'getChildren' | 'forEachChild';
 }
 export function createCssSelectorForTs(
-    sourceFile: SourceFile | string | ts.Node,
+    nodeOrString: SourceFile | string | ts.Node,
     options: CssSelectorForTsOptions = { childrenMode: 'getChildren' }
 ) {
-    if (typeof sourceFile == 'string') {
-        sourceFile = ts.createSourceFile('', sourceFile, ts.ScriptTarget.Latest, true);
+    if (typeof nodeOrString == 'string') {
+        nodeOrString = ts.createSourceFile('', nodeOrString, ts.ScriptTarget.Latest);
     }
-    return new CssSelectorForTs(sourceFile, options);
+    return new CssSelectorForTs(nodeOrString, options);
 }
 
 export class CssSelectorForTs extends CssSelectorBase<ts.Node> {
+    private sourceFile: SourceFile;
     constructor(public rootNode: SourceFile | ts.Node, private options: CssSelectorForTsOptions) {
         super();
+        this.sourceFile = ts.isSourceFile(rootNode) ? rootNode : undefined;
     }
-
+    /** 如果传入的rootNode不是SourceFile,那么在遍历时就需要传入sf确定子节点及text */
+    public setSourceFile(sf: SourceFile) {
+        this.sourceFile = sf;
+    }
     protected getTagAttribute(selector: AttributeSelector, node: ts.Node): { value: string } {
         try {
             return node[selector.name] && Number.isInteger(node[selector.name].kind)
                 ? {
-                      value: node[selector.name].getText && node[selector.name].getText(),
+                      value: node[selector.name].getText && node[selector.name].getText(this.sourceFile),
                   }
                 : undefined;
         } catch (error) {
@@ -54,7 +59,7 @@ export class CssSelectorForTs extends CssSelectorBase<ts.Node> {
             node.forEachChild((node) => children.push(node) && undefined);
             return children;
         } else {
-            return node.getChildren();
+            return node.getChildren(this.sourceFile);
         }
     }
 }

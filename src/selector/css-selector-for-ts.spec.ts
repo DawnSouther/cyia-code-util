@@ -2,7 +2,7 @@ import * as ts from 'typescript';
 import { createCssSelectorForTs } from './css-selector-for-ts';
 
 function createSourceFile(content: string, name = '') {
-    return ts.createSourceFile(name, content, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+    return ts.createSourceFile(name, content, ts.ScriptTarget.Latest, false, ts.ScriptKind.TSX);
 }
 function mockSourceFile() {
     return createSourceFile('');
@@ -73,5 +73,16 @@ describe('用于ts node的css选择器', () => {
         let result = nodeSelector.queryAll('NumericLiteral');
         expect(result.length).toBe(2);
         expect(result[0].kind).toBe(ts.SyntaxKind.NumericLiteral);
+    });
+    it('普通 node 做根节点(属性查询)', () => {
+        let sourceFile = ts.createSourceFile('', `let a={b:1}`, ts.ScriptTarget.Latest);
+        let cssSelctor = createCssSelectorForTs(sourceFile);
+        let nodeSelector = createCssSelectorForTs(cssSelctor.queryOne('ObjectLiteralExpression'));
+        let result = nodeSelector.queryAll('PropertyAssignment[name=b]');
+        expect(result.length).toBe(0);
+        nodeSelector.setSourceFile(sourceFile);
+        result = nodeSelector.queryAll('PropertyAssignment[name=b]');
+        expect(result.length).toBe(1);
+        expect(result[0].kind).toBe(ts.SyntaxKind.PropertyAssignment);
     });
 });
