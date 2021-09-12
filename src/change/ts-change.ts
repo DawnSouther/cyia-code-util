@@ -35,7 +35,7 @@ export class TsChange {
         if (index === list.length && index !== 0 && !list.hasTrailingComma) {
             startComma = true;
         }
-        if (index !== list.length) {
+        if (index !== list.length || list.hasTrailingComma) {
             endComma = true;
         }
         if (index === 0) {
@@ -58,14 +58,28 @@ export class TsChange {
             list = node.elements;
         }
         let deleteList: DeleteChange[] = [];
+        let lastIndex: { index: number; current: number; end: boolean } = undefined;
         list.forEach((node, index) => {
             if (!deleteFunction(node, index)) {
                 return;
             }
+            if (lastIndex === undefined) {
+                lastIndex = { index, current: index, end: undefined };
+            } else if (lastIndex.current + 1 === index) {
+                lastIndex.current++;
+            } else {
+                lastIndex = { index, current: index, end: undefined };
+            }
+            lastIndex.end = index === list.length - 1;
             let start = index === 0 ? list.pos : node.pos;
             let end = index === list.length - 1 ? list.end : list[index + 1].pos;
             deleteList.push(new DeleteChange(start, end - start));
         });
+        if (!list.hasTrailingComma && lastIndex && lastIndex.index && lastIndex.end) {
+            let start = list[lastIndex.index - 1].end;
+            let end = list[lastIndex.index].pos;
+            deleteList.push(new DeleteChange(start, end - start));
+        }
         return deleteList;
     }
     private getNodeStart(node: Node, options: NodeOptions = {}) {

@@ -1,6 +1,7 @@
 import ts from 'typescript';
 import { UpdaterTest } from '../../test/updater/updater.test';
 import { createCssSelectorForTs } from '../selector';
+import { InsertChange, DeleteChange } from './content-change';
 import { TsChange } from './ts-change';
 
 describe('ts-change', () => {
@@ -78,7 +79,7 @@ describe('ts-change', () => {
         let change = new TsChange(file);
         let result = change.insertChildNode(node, 'abc:2');
         let newContent = UpdaterTest.update(file.text, result);
-        expect(newContent).toBe(`let a={b:1/**注释*/,abc:2}`);
+        expect(newContent).toBe(`let a={b:1/**注释*/,abc:2,}`);
     });
     it('插入子节点内容(对象,尾逗号,位置)', () => {
         let file = ts.createSourceFile('', `let a={b:1/**注释*/,}`, ts.ScriptTarget.Latest, true);
@@ -176,5 +177,21 @@ describe('ts-change', () => {
             newContent = UpdaterTest.update(newContent, change);
         });
         expect(newContent).toBe(`let a=[1/**abc*/,3]`);
+    });
+    it('替换子节点内容(对象,尾逗号,中间)', () => {
+        let file = ts.createSourceFile('', `let a={a: '1',b: '2',c: ['3']// d:[4]}`, ts.ScriptTarget.Latest, true);
+        let selector = createCssSelectorForTs(file);
+        let node = selector.queryOne('ObjectLiteralExpression') as ts.ObjectLiteralExpression;
+        let change = new TsChange(file);
+        let chaneList: (InsertChange | DeleteChange)[] = change.deleteChildNode(node, (node, index) => index === 1 || index === 2);
+
+        chaneList.push(change.insertChildNode(node, 'ab:2'));
+        let newContent = file.text;
+        chaneList
+            .sort((a, b) => b.start - a.start)
+            .forEach((change) => {
+                newContent = UpdaterTest.update(newContent, change);
+            });
+        expect(newContent).toBe(`let a={a: '1',ab:2// d:[4]}`);
     });
 });
