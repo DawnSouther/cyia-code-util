@@ -122,4 +122,11 @@ describe('选择器基类', () => {
         expect(selector.queryAll(result[0], '.test').length).toBe(0);
         expect(selector.queryAll(result[0], 'p').length).toBe(1);
     });
+    it('*', () => {
+        expect(selector.queryAll('*').length).toBe(4);
+        expect(selector.queryAll('div *').length).toBe(2);
+        let pChildren = selector.queryAll('p *');
+        expect(pChildren.length).toBe(1);
+        expect(pChildren[0].tag).toBe('code');
+    });
 });

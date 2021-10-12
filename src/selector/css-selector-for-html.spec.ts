@@ -103,4 +103,9 @@ describe('用于ts node的css选择器', () => {
         expect(cssSelctor.queryAll('div+#mock').length).toBe(0);
         expect(cssSelctor.queryAll('div~#mock').length).toBe(0);
     });
+    it('*', () => {
+        let cssSelctor = createCssSelectorForHtml(mockHtml);
+        expect(cssSelctor.queryAll('*').length).toBe(4);
+        expect(cssSelctor.queryAll('div *').length).toBe(2);
+    });
 });
