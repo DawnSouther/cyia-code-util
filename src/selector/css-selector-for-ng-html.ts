@@ -6,19 +6,19 @@ import { CssSelectorBase } from './css-selector-base';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { BoundText, Content, Node, Template, Text } from '@angular/compiler/src/render3/r3_ast';
 
-function isElement(node: Node): node is Element {
+export function isElement(node: Node): node is Element {
     return node instanceof Element;
 }
-function isBoundText(node: Node): node is BoundText {
+export function isBoundText(node: Node): node is BoundText {
     return node instanceof BoundText;
 }
-function isText(node: Node): node is Text {
+export function isText(node: Node): node is Text {
     return node instanceof Text;
 }
-function isTemplate(node: Node): node is Template {
+export function isTemplate(node: Node): node is Template {
     return node instanceof Template;
 }
-function isContent(node: any): node is Content {
+export function isContent(node: any): node is Content {
     return node instanceof Content;
 }
 interface NodeIterationOptions {
