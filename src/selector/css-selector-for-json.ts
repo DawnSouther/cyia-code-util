@@ -1,6 +1,6 @@
-import { AttributeSelector } from 'css-what';
+import type { AttributeSelector } from 'css-what';
 import { Node, ParseError, parseTree, printParseErrorCode } from 'jsonc-parser';
-import { CssSelectorBase, NodeContext } from './css-selector-base';
+import { CssSelectorBase } from './css-selector-base';
 
 export function createCssSelectorForJson(htmlContent: string) {
     return new CssSelectorForJson(htmlContent);
@@ -35,19 +35,5 @@ export class CssSelectorForJson extends CssSelectorBase<Node> {
             return node?.children[1]?.children?.filter((item) => item.type === 'property') || [];
         }
         return (node.children && node.children.filter((item) => item.type === 'property')) || [];
-    }
-    protected findWithEachNode(node: NodeContext<Node>, fn: (node: Node) => boolean, multiLevel?: boolean): NodeContext<Node>[] {
-        let list: NodeContext<Node>[] = [node];
-        let result = [];
-        while (list.length) {
-            let node = list.pop();
-            if (fn(node.node)) {
-                result.push(node);
-            }
-            if (multiLevel) {
-                list.push(...this.getChildren(node.node).map((childNode, i) => new NodeContext(childNode, node, i)));
-            }
-        }
-        return result;
     }
 }

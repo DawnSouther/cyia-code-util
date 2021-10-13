@@ -1,8 +1,8 @@
 import { HtmlParser, makeBindingParser, InterpolationConfig, DEFAULT_INTERPOLATION_CONFIG } from '@angular/compiler';
 import { Element } from '@angular/compiler/src/render3/r3_ast';
 import { htmlAstToRender3Ast } from '@angular/compiler/src/render3/r3_template_transform';
-import { AttributeSelector } from 'css-what';
-import { CssSelectorBase, NodeContext } from './css-selector-base';
+import type { AttributeSelector } from 'css-what';
+import { CssSelectorBase } from './css-selector-base';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { BoundText, Content, Node, Template, Text } from '@angular/compiler/src/render3/r3_ast';
 
