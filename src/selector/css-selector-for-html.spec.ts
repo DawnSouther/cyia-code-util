@@ -16,22 +16,22 @@ describe('用于ts node的css选择器', () => {
         expect(result.length).toBe(1);
     });
     it('~', () => {
-        let cssSelctor = createCssSelectorForHtml(mockHtml);
-        let result = cssSelctor.queryAll('div~span');
+        let cssSelector = createCssSelectorForHtml(mockHtml);
+        let result = cssSelector.queryAll('div~span');
 
         expect(result.length).toBe(1);
         expect(result[0].name === 'span').toBeTrue();
     });
     it('>', () => {
-        let cssSelctor = createCssSelectorForHtml(mockHtml);
-        let result = cssSelctor.queryAll('div>p');
+        let cssSelector = createCssSelectorForHtml(mockHtml);
+        let result = cssSelector.queryAll('div>p');
 
         expect(result.length).toBe(1);
         expect(result[0].name === 'p').toBeTrue();
     });
     it(',', () => {
-        let cssSelctor = createCssSelectorForHtml(mockHtml);
-        let result = cssSelctor.queryAll('div,span');
+        let cssSelector = createCssSelectorForHtml(mockHtml);
+        let result = cssSelector.queryAll('div,span');
 
         expect(result.length).toBe(2);
     });
@@ -44,68 +44,68 @@ describe('用于ts node的css选择器', () => {
         expect(result[0].attrs.find((item) => item.name == 'id' && item.value == 'mock')).toBeTruthy();
     });
     it('attribute exist', () => {
-        let cssSelctor = createCssSelectorForHtml(mockHtml);
-        let result = cssSelctor.queryAll('div[id]');
+        let cssSelector = createCssSelectorForHtml(mockHtml);
+        let result = cssSelector.queryAll('div[id]');
 
         expect(result.length).toBe(1);
         expect(result[0].name === 'div').toBeTruthy();
         expect(result[0].attrs.find((item) => item.name == 'id')).toBeTruthy();
     });
     it('attribute any', () => {
-        let cssSelctor = createCssSelectorForHtml(mockHtml);
-        let result = cssSelctor.queryAll('div[id*=mo]');
+        let cssSelector = createCssSelectorForHtml(mockHtml);
+        let result = cssSelector.queryAll('div[id*=mo]');
 
         expect(result.length).toBe(1);
         expect(result[0].name === 'div').toBeTruthy();
         expect(result[0].attrs.find((item) => item.name == 'id' && item.value == 'mock')).toBeTruthy();
     });
     it('.class', () => {
-        let cssSelctor = createCssSelectorForHtml(mockHtml);
-        let result = cssSelctor.queryAll('div.test');
+        let cssSelector = createCssSelectorForHtml(mockHtml);
+        let result = cssSelector.queryAll('div.test');
         expect(result.length).toBe(1);
         expect(result[0].name === 'div').toBeTruthy();
         expect(result[0].attrs.find((item) => item.value == 'test')).toBeTruthy();
     });
     it('#id', () => {
-        let cssSelctor = createCssSelectorForHtml(mockHtml);
-        let result = cssSelctor.queryAll('#mock');
+        let cssSelector = createCssSelectorForHtml(mockHtml);
+        let result = cssSelector.queryAll('#mock');
         expect(result.length).toBe(1);
         expect(result[0].name === 'div').toBeTruthy();
         expect(result[0].attrs.find((item) => item.value == 'test')).toBeTruthy();
     });
     it('通过返回的element进行查询', () => {
-        let cssSelctor = createCssSelectorForHtml(mockHtml);
-        let result = cssSelctor.queryAll('div.test');
+        let cssSelector = createCssSelectorForHtml(mockHtml);
+        let result = cssSelector.queryAll('div.test');
         expect(result.length).toBe(1);
-        result = cssSelctor.queryAll(result[0], 'p');
+        result = cssSelector.queryAll(result[0], 'p');
         expect(result.length).toBe(1);
         expect(result[0].name).toBe('p');
     });
     it('a b c', () => {
-        let cssSelctor = createCssSelectorForHtml(mockHtml);
-        let result = cssSelctor.queryAll('div  p code');
+        let cssSelector = createCssSelectorForHtml(mockHtml);
+        let result = cssSelector.queryAll('div  p code');
         expect(result.length).toBe(1);
         expect(result[0].name === 'code').toBeTruthy();
     });
     it('复杂选择', () => {
-        let cssSelctor = createCssSelectorForHtml(mockHtml);
-        let result = cssSelctor.queryAll('div#mock.test[class=test][id=mock] p');
+        let cssSelector = createCssSelectorForHtml(mockHtml);
+        let result = cssSelector.queryAll('div#mock.test[class=test][id=mock] p');
         expect(result.length).toBe(1);
         expect(result[0].name === 'p').toBeTruthy();
     });
     it('不应该选中', () => {
-        let cssSelctor = createCssSelectorForHtml(mockHtml);
+        let cssSelector = createCssSelectorForHtml(mockHtml);
 
-        expect(cssSelctor.queryAll('div .test').length).toBe(0);
-        expect(cssSelctor.queryAll('div [class=test]').length).toBe(0);
-        expect(cssSelctor.queryAll('div #mock').length).toBe(0);
-        expect(cssSelctor.queryAll('div>#mock').length).toBe(0);
-        expect(cssSelctor.queryAll('div+#mock').length).toBe(0);
-        expect(cssSelctor.queryAll('div~#mock').length).toBe(0);
+        expect(cssSelector.queryAll('div .test').length).toBe(0);
+        expect(cssSelector.queryAll('div [class=test]').length).toBe(0);
+        expect(cssSelector.queryAll('div #mock').length).toBe(0);
+        expect(cssSelector.queryAll('div>#mock').length).toBe(0);
+        expect(cssSelector.queryAll('div+#mock').length).toBe(0);
+        expect(cssSelector.queryAll('div~#mock').length).toBe(0);
     });
     it('*', () => {
-        let cssSelctor = createCssSelectorForHtml(mockHtml);
-        expect(cssSelctor.queryAll('*').length).toBe(4);
-        expect(cssSelctor.queryAll('div *').length).toBe(2);
+        let cssSelector = createCssSelectorForHtml(mockHtml);
+        expect(cssSelector.queryAll('*').length).toBe(4);
+        expect(cssSelector.queryAll('div *').length).toBe(2);
     });
 });
