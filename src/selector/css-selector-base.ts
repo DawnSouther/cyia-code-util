@@ -166,18 +166,19 @@ export abstract class CssSelectorBase<NODE> {
                 this.currentNodeList = list;
                 this.limit = false;
                 break;
+            // *
             case 'universal':
                 this.currentNodeList = [].concat(
-                    ...this.currentNodeList.map((nodeContext) => this.getAllNode(nodeContext.parent || nodeContext))
+                    ...this.currentNodeList.map((nodeContext) => this.findWithEachNode(nodeContext, () => true, true))
                 );
+                if (this.currentNodeList[0].node === this.rootNode) {
+                    this.currentNodeList.shift();
+                }
+                break;
             default:
                 break;
         }
 
         return !!this.currentNodeList.length;
-    }
-    private getAllNode(nodeContext: NodeContext<NODE>): NodeContext<NODE>[] {
-        let list = this.getChildren(nodeContext.node).map((child, i) => new NodeContext(child, nodeContext, i));
-        return list.concat(...list.map((nodeContext) => this.getAllNode(nodeContext)));
     }
 }
