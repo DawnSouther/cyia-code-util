@@ -10,7 +10,7 @@ export function createCssSelectorForTs(
     options: CssSelectorForTsOptions = { childrenMode: 'getChildren' }
 ) {
     if (typeof nodeOrString == 'string') {
-        nodeOrString = ts.createSourceFile('', nodeOrString, ts.ScriptTarget.Latest);
+        nodeOrString = ts.createSourceFile('', nodeOrString, ts.ScriptTarget.Latest, true);
     }
     return new CssSelectorForTs(nodeOrString, options);
 }
