@@ -129,4 +129,10 @@ describe('选择器基类', () => {
         expect(pChildren.length).toBe(1);
         expect(pChildren[0].tag).toBe('code');
     });
+    it('指定节点为undefined时选择,直接返回', () => {
+        let result = selector.queryOne('not-a-label');
+        expect(result).toBeFalsy();
+        result = selector.queryOne(result, 'div');
+        expect(result).toBeFalsy();
+    });
 });

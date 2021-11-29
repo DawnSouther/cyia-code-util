@@ -71,6 +71,8 @@ export abstract class CssSelectorBase<NODE> {
         if (typeof arg1 === 'string') {
             selector = arg1;
             initQueryNodeContext = this.getInitQueryNodeContext(undefined);
+        } else if (typeof arg1 === 'undefined' && typeof arg2 === 'string') {
+            return [];
         } else {
             selector = arg2;
             initQueryNodeContext = this.getInitQueryNodeContext(arg1);
