@@ -26,6 +26,8 @@ const mockNode: MockNode = {
     children: [
         { tag: 'div', attrs: { class: { value: 'test' }, id: { value: 'mock' } }, children: [{ tag: 'p', children: [{ tag: 'code' }] }] },
         { tag: 'span' },
+        { tag: 'test-class', attrs: { class: { value: 'one' }, lang: { value: 'zh-cn' } } },
+        { tag: 'two-class', attrs: { class: { value: 'one two' } } },
     ],
 };
 describe('选择器基类', () => {
@@ -123,7 +125,7 @@ describe('选择器基类', () => {
         expect(selector.queryAll(result[0], 'p').length).toBe(1);
     });
     it('*', () => {
-        expect(selector.queryAll('*').length).toBe(4);
+        expect(selector.queryAll('*').length).toBe(6);
         expect(selector.queryAll('div *').length).toBe(2);
         let pChildren = selector.queryAll('p *');
         expect(pChildren.length).toBe(1);
@@ -134,5 +136,50 @@ describe('选择器基类', () => {
         expect(result).toBeFalsy();
         result = selector.queryOne(result, 'div');
         expect(result).toBeFalsy();
+    });
+    it('attribute $=', () => {
+        let result = selector.queryOne(`[id$=ck]`);
+        expect(result).toBeTruthy();
+        result = selector.queryOne(`[id$=mo]`);
+        expect(result).toBeFalsy();
+    });
+    it('attribute ^=', () => {
+        let result = selector.queryOne(`[id^=mo]`);
+        expect(result).toBeTruthy();
+        result = selector.queryOne(`[id^=ck]`);
+        expect(result).toBeFalsy();
+    });
+    it('attribute |=', () => {
+        let result = selector.queryOne(`[lang|=zh]`);
+        expect(result).toBeTruthy();
+
+        result = selector.queryOne(`[class|=zh-cn]`);
+        expect(result).toBeFalsy();
+    });
+    it('attribute ~=', () => {
+        let result = selector.queryOne(`[class~=one]`);
+        expect(result).toBeTruthy();
+        result = selector.queryOne(`[class~=two]`);
+        expect(result).toBeTruthy();
+        result = selector.queryOne(`[class~=no-class]`);
+        expect(result).toBeFalsy();
+    });
+    it('attribute !=', () => {
+        let result = selector.queryOne(`[class!=one]`);
+        expect(result).toBeTruthy();
+        result = selector.queryOne(`[class!="one two"][class!=one][class!=test]`);
+        expect(result).toBeFalsy();
+    });
+    it('attribute default', () => {
+        let result = selector.queryOne(`[class%=one]`);
+        expect(result).toBeTruthy();
+    });
+    it('default', () => {
+        try {
+            selector.queryOne(`div < xxx`);
+        } catch (error) {
+            return expect(error).toBeTruthy();
+        }
+        throw new Error('');
     });
 });

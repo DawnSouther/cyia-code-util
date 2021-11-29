@@ -43,7 +43,7 @@ export class TsChange {
         } else if (index > list.length || index === list.length) {
             start = list.end;
         } else {
-            start = list[index - 1].pos + this.getNodeWidth(list[index - 1], { full: true });
+            start = list[index - 1].pos + this.getNodeWidth(list[index - 1], { full: true }) + 1;
         }
         return new InsertChange(start, `${startComma ? ',' : ''}${content}${endComma ? ',' : ''}`);
     }

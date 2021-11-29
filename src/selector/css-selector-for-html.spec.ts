@@ -108,4 +108,12 @@ describe('用于ts node的css选择器', () => {
         expect(cssSelector.queryAll('*').length).toBe(4);
         expect(cssSelector.queryAll('div *').length).toBe(2);
     });
+    it('解析失败抛出异常', () => {
+        try {
+            createCssSelectorForHtml(`<div <div>`);
+        } catch (error) {
+            return expect(error).toBeTruthy();
+        }
+        throw new Error('');
+    });
 });

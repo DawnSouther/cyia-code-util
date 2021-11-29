@@ -85,4 +85,8 @@ describe('用于ts node的css选择器', () => {
         expect(result.length).toBe(1);
         expect(result[0].kind).toBe(ts.SyntaxKind.PropertyAssignment);
     });
+    it('forEachChild', () => {
+        let cssSelctor = createCssSelectorForTs(`let a=1`, { childrenMode: 'forEachChild' });
+        expect(cssSelctor.queryOne(`[name=a]`)).toBeTruthy();
+    });
 });

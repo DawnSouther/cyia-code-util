@@ -48,8 +48,8 @@ export interface Render3ParseOptions {
     collectCommentNodes: boolean;
 }
 const ROOT_NAME = `__root`;
-export function createCssSelectorForNgHtml(htmlContent: string) {
-    return new CssSelectorForNgHtml(htmlContent);
+export function createCssSelectorForNgHtml(htmlContent: string, render3ParseOptions?: Render3ParseOptions, markers?: [string, string]) {
+    return new CssSelectorForNgHtml(htmlContent, render3ParseOptions, markers);
 }
 
 export class CssSelectorForNgHtml extends CssSelectorBase<Node> {

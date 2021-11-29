@@ -178,7 +178,7 @@ export abstract class CssSelectorBase<NODE> {
                 }
                 break;
             default:
-                break;
+                throw new Error(`${selector.type} not support`);
         }
 
         return !!this.currentNodeList.length;

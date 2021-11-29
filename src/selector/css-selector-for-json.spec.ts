@@ -61,4 +61,12 @@ describe('用于json的css选择器', () => {
         result = selector.queryOne(result, 'p31 p32');
         expect(result).toBeTruthy();
     });
+    it('解析失败抛出异常', () => {
+        try {
+            createCssSelectorForJson(`{a:1}`);
+        } catch (error) {
+            return expect(error).toBeTruthy();
+        }
+        throw new Error('');
+    });
 });

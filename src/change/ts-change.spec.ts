@@ -183,15 +183,43 @@ describe('ts-change', () => {
         let selector = createCssSelectorForTs(file);
         let node = selector.queryOne('ObjectLiteralExpression') as ts.ObjectLiteralExpression;
         let change = new TsChange(file);
-        let chaneList: (InsertChange | DeleteChange)[] = change.deleteChildNode(node, (node, index) => index === 1 || index === 2);
+        let changeList: (InsertChange | DeleteChange)[] = change.deleteChildNode(node, (node, index) => index === 1 || index === 2);
 
-        chaneList.push(change.insertChildNode(node, 'ab:2'));
+        changeList.push(change.insertChildNode(node, 'ab:2'));
         let newContent = file.text;
-        chaneList
+        changeList
             .sort((a, b) => b.start - a.start)
             .forEach((change) => {
                 newContent = UpdaterTest.update(newContent, change);
             });
         expect(newContent).toBe(`let a={a: '1',ab:2// d:[4]}`);
+    });
+    it('对象中间插入字段', () => {
+        let file = ts.createSourceFile('', `let a={a: '1',b: '2',c: ['3']}`, ts.ScriptTarget.Latest, true);
+        let selector = createCssSelectorForTs(file);
+        let node = selector.queryOne('ObjectLiteralExpression') as ts.ObjectLiteralExpression;
+        let change = new TsChange(file);
+        let insertChange = change.insertChildNode(node, `insert:'a'`, 1);
+        let newContent = UpdaterTest.update(file.text, insertChange);
+        expect(newContent).toBe(`let a={a: '1',insert:'a',b: '2',c: ['3']}`);
+    });
+    it('对象中间删除节点', () => {
+        let file = ts.createSourceFile('', `let a={a: '1',b: '2',c: ['3']}`, ts.ScriptTarget.Latest, true);
+        let selector = createCssSelectorForTs(file);
+        let node = selector.queryOne('ObjectLiteralExpression') as ts.ObjectLiteralExpression;
+        let change = new TsChange(file);
+        let changeList = change.deleteChildNode(node, (item, index) => {
+            if (index === 2 || index === 0) {
+                return true;
+            }
+            return false;
+        });
+        let newContent = file.text;
+        changeList
+            .sort((a, b) => b.start - a.start)
+            .forEach((item) => {
+                newContent = UpdaterTest.update(newContent, item);
+            });
+        expect(newContent).toBe(`let a={b: '2'}`);
     });
 });
