@@ -42,7 +42,7 @@ export abstract class CssSelectorBase<NODE> {
         let list: NodeContext<NODE>[] = [context];
         let result = [];
         while (list.length) {
-            let node = list.pop();
+            let node = list.shift();
             if (fn(node.node)) {
                 result.push(node);
             }
